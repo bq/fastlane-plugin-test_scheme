@@ -5,20 +5,33 @@ module Fastlane
   module Actions
     class TestSchemeAction < Action
       def self.run(params)
-        ENV['XCPRETTY_JSON_FILE_OUTPUT'] = "./output/#{params[:name]}.build-report.json"
-        Actions::ScanAction.run(
-          scheme: params[:scheme],
-          configuration: params[:configuration],
-          disable_concurrent_testing: true,
-          max_concurrent_simulators: 1,
-          buildlog_path: "./output",
-          output_directory: "./output",
-          formatter: 'xcpretty-json-formatter',
-          skip_slack: true
-        )
-        report = Actions::TrainerAction.run(output_directory: "./output")
+        output_directory = File.expand_path(params[:output_directory])
+
+        ENV['XCPRETTY_JSON_FILE_OUTPUT'] = "#{params[:output_directory]}/#{params[:name]}.build-report.json"
+
+        scan_options = {}
+        scan_options[:scheme] = params[:scheme]
+        scan_options[:configuration] = params[:configuration]
+        scan_options[:disable_concurrent_testing] = true
+        scan_options[:max_concurrent_simulators] = 1
+        scan_options[:buildlog_path] = output_directory
+        scan_options[:output_directory] = output_directory
+        scan_options[:formatter] = "xcpretty-json-formatter"
+        scan_options[:skip_slack] = true
+        config = FastlaneCore::Configuration.create(Fastlane::Actions::ScanAction.available_options, scan_options)
+        Fastlane::Actions::ScanAction.run(config)
+
+        trainer_options = {}
+        trainer_options[:output_directory] = output_directory
+        config = FastlaneCore::Configuration.create(Fastlane::Actions::TrainerAction.available_options, trainer_options)
+        report = Actions::TrainerAction.run(config)
         report_path, report_finished = report.first
-        File.rename(".#{report_path}", "../output/#{params[:name]}.test-report.xml") if report_finished
+        report_desired_path = "#{output_directory}/#{params[:name]}.test-report.xml"
+
+        if report_finished 
+          File.rename(report_path, report_desired_path) 
+          UI.message "Reporte renamed to: #{report_desired_path}"
+        end
       end
 
       def self.description
@@ -43,7 +56,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        env_name: "TEST_SCHEME_OUTPUT_DIRECTORY",
                                        description: "Path to the directory that should be converted",
-                                       default_value: "./ouput",
+                                       default_value: "./output",
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "TEST_SCHEME_SCHEME",
