@@ -6,7 +6,7 @@ module Fastlane
     class TestSchemeAction < Action
       def self.run(params)
         ENV['XCPRETTY_JSON_FILE_OUTPUT'] = "./output/#{params[:name]}.build-report.json"
-        scan(
+        Actions::ScanAction.run(
           scheme: params[:scheme],
           configuration: params[:configuration],
           disable_concurrent_testing: true,
@@ -16,7 +16,7 @@ module Fastlane
           formatter: 'xcpretty-json-formatter',
           skip_slack: true
         )
-        report = trainer(output_directory: "./output")
+        report = Actions::TrainerAction.run(output_directory: "./output")
         report_path, report_finished = report.first
         File.rename(".#{report_path}", "../output/#{params[:name]}.test-report.xml") if report_finished
       end
@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Sebastián Varela"]
+        ["sebastianvarela"]
       end
 
       def self.return_value
