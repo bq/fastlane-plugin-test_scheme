@@ -9,7 +9,8 @@ module Fastlane
 
         ENV['XCPRETTY_JSON_FILE_OUTPUT'] = "#{params[:output_directory]}/#{params[:name]}.build-report.json"
 
-        clear_derived_data if params[:clear_derived_data]
+        config = FastlaneCore::Configuration.create(Fastlane::Actions::ClearDerivedDataAction.available_options, {})
+        Fastlane::Actions::ClearDerivedDataAction.run(config) if params[:clear_derived_data]
 
         scan_options = {}
         scan_options[:scheme] = params[:scheme]
