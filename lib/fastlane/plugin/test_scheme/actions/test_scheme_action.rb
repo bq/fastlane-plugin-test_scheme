@@ -9,6 +9,8 @@ module Fastlane
 
         ENV['XCPRETTY_JSON_FILE_OUTPUT'] = "#{params[:output_directory]}/#{params[:name]}.build-report.json"
 
+        clear_derived_data if params[:clear_derived_data]
+
         scan_options = {}
         scan_options[:scheme] = params[:scheme]
         scan_options[:configuration] = params[:configuration]
@@ -53,6 +55,11 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :clear_derived_data,
+                                       env_name: "TEST_SCHEME_CLEAR_DERIVED_DATA",
+                                       description: "Clear derived data before start testing",
+                                       default_value: true,
+                                       is_string: false),          
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        env_name: "TEST_SCHEME_OUTPUT_DIRECTORY",
                                        description: "Path to the directory that should be converted",
