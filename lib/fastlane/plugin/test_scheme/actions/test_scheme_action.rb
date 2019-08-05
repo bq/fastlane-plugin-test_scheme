@@ -17,8 +17,8 @@ module Fastlane
         scan_options[:configuration] = params[:configuration]
         scan_options[:disable_concurrent_testing] = true
         scan_options[:max_concurrent_simulators] = 1
-        scan_options[:buildlog_path] = output_directory
-        scan_options[:output_directory] = output_directory
+        scan_options[:buildlog_path] = "#{output_directory}/#{params[:name]}/build-log/"
+        scan_options[:output_directory] = "#{output_directory}/#{params[:name]}/test-report"
         scan_options[:formatter] = "xcpretty-json-formatter"
         scan_options[:skip_slack] = true
         config = FastlaneCore::Configuration.create(Fastlane::Actions::ScanAction.available_options, scan_options)
