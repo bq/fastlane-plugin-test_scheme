@@ -35,6 +35,15 @@ module Fastlane
           File.rename(report_path, report_desired_path) 
           UI.message "Reporte renamed to: #{report_desired_path}"
         end
+
+        xcov_options = {}
+        xcov_options[:scheme] = params[:scheme]
+        xcov_options[:output_directory] = "#{output_directory}/#{params[:name]}/coverage-report/"
+        xcov_options[:only_project_targets] = true
+        xcov_options[:skip_slack] = true
+        config = FastlaneCore::Configuration.create(Fastlane::Actions::XcovAction.available_options, xcov_options)
+        Fastlane::Actions::XcovAction.run(config)  
+            
       end
 
       def self.description
