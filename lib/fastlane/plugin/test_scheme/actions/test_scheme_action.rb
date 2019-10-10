@@ -24,6 +24,7 @@ module Fastlane
         config = FastlaneCore::Configuration.create(Fastlane::Actions::ScanAction.available_options, scan_options)
         Fastlane::Actions::ScanAction.run(config)
 
+        report_desired_path = "#{output_directory}/#{params[:name]}.test-report.xml"
         FileUtils.cp("#{output_directory}/#{params[:name]}/test-report/report.junit", report_desired_path)
         UI.message "Report copied to: #{report_desired_path}"
 
