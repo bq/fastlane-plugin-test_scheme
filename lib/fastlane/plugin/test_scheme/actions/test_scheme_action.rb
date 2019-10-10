@@ -24,17 +24,8 @@ module Fastlane
         config = FastlaneCore::Configuration.create(Fastlane::Actions::ScanAction.available_options, scan_options)
         Fastlane::Actions::ScanAction.run(config)
 
-        trainer_options = {}
-        trainer_options[:output_directory] = output_directory
-        config = FastlaneCore::Configuration.create(Fastlane::Actions::TrainerAction.available_options, trainer_options)
-        report = Actions::TrainerAction.run(config)
-        report_path, report_finished = report.first
-        report_desired_path = "#{output_directory}/#{params[:name]}.test-report.xml"
-
-        if report_finished 
-          File.rename(report_path, report_desired_path) 
-          UI.message "Reporte renamed to: #{report_desired_path}"
-        end
+        FileUtils.cp("#{output_directory}/#{params[:name]}/test-report/report.junit", report_desired_path)
+        UI.message "Report copied to: #{report_desired_path}"
 
         xcov_options = {}
         xcov_options[:scheme] = params[:scheme]
